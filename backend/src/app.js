@@ -14,7 +14,7 @@ app.route("/").get((req, res) => {
 });
 
 // import user routes
-import userRoutes from "./routes/user.router.js";
+import userRoutes from "./routes/user.route.js";
 import tripRoutes from "./routes/trip.route.js";
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/trip", tripRoutes);
