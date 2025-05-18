@@ -60,3 +60,15 @@ export const getTripMembers = (req, res) => {
     return res.status(200).json(new ApiResponse(200, results, "Get trip members"));
   });
 };
+
+// Add a member to a trip
+export const addTripMember = (req, res) => {
+  const { tripId } = req.params;
+  const { userId } = req.body;
+
+  const query = `INSERT INTO trip_members (trip_id, user_id) VALUES (?, ?)`;
+  db.query(query, [tripId, userId], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Member added' });
+  });
+};
