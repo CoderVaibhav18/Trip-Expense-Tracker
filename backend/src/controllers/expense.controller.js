@@ -8,7 +8,7 @@ export const addExpense = async (req, res) => {
   const { amount, description } = req.body;
   const paidBy = req.user.userId;
 
-   const imageUrl = req.file ? req.file.path : null; 
+   const imageUrl = req.file ? req.file.path : null;   
 
   // Step 1: Insert into expenses
   db.query(
