@@ -2,6 +2,7 @@ import db from "../config/db.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+// Create a new trip
 export const createTrip = (req, res) => {
   const { name, description, memberIds } = req.body;
   const createdBy = req.user.userId;
@@ -30,6 +31,7 @@ export const createTrip = (req, res) => {
   );
 };
 
+// Get trips for logged-in user
 export const getMyTrips = (req, res) => {
   const userId = req.user.userId;
   const query = `
@@ -37,9 +39,24 @@ export const getMyTrips = (req, res) => {
     JOIN trip_members tm ON t.id = tm.trip_id
     WHERE tm.user_id = ?
   `;
-  
+
   db.query(query, [userId], (err, results) => {
     if (err) throw new ApiError(500, err.message);
-    res.status(200).json(new ApiResponse(200, results, "Get my trips"));
+    return res.status(200).json(new ApiResponse(200, results, "Get my trips"));
+  });
+};
+
+// Get trip members
+export const getTripMembers = (req, res) => {
+  const { tripId } = req.params;
+
+  const query = `
+    SELECT u.id, u.name, u.email FROM users u
+    JOIN trip_members tm ON u.id = tm.user_id
+    WHERE tm.trip_id = ?
+  `;
+  db.query(query, [tripId], (err, results) => {
+    if (err) throw new ApiError(500, err.message);
+    return res.status(200).json(new ApiResponse(200, results, "Get trip members"));
   });
 };
