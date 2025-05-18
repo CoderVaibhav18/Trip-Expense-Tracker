@@ -12,7 +12,7 @@ export const createTrip = (req, res) => {
     (err, result) => {
       if (err) throw new ApiError(500, err.message);
 
-      const tripId = result.insertId;
+      const tripId = result.insertId; // this is trip id
       const allMembers = [...new Set([createdBy, ...memberIds])];
 
       const values = allMembers.map((userId) => [tripId, userId]);
@@ -28,4 +28,18 @@ export const createTrip = (req, res) => {
       );
     }
   );
+};
+
+export const getMyTrips = (req, res) => {
+  const userId = req.user.userId;
+  const query = `
+    SELECT t.* FROM trips t
+    JOIN trip_members tm ON t.id = tm.trip_id
+    WHERE tm.user_id = ?
+  `;
+  
+  db.query(query, [userId], (err, results) => {
+    if (err) throw new ApiError(500, err.message);
+    res.status(200).json(new ApiResponse(200, results, "Get my trips"));
+  });
 };
