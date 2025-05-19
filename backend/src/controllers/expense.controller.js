@@ -1,14 +1,15 @@
 import db from "../config/db.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Add Expense with Auto-Split
-export const addExpense = async (req, res) => {
+export const addExpense = asyncHandler(async (req, res) => {
   const { tripId } = req.params;
   const { amount, description } = req.body;
   const paidBy = req.user.userId;
 
-   const imageUrl = req.file ? req.file.path : null;   
+  const imageUrl = req.file ? req.file.path : null;
 
   // Step 1: Insert into expenses
   db.query(
@@ -51,10 +52,10 @@ export const addExpense = async (req, res) => {
       );
     }
   );
-};
+});
 
 //  Get Trip Expenses
-export const getTripExpenses = (req, res) => {
+export const getTripExpenses = asyncHandler(async (req, res) => {
   const { tripId } = req.params;
   const query = `
     SELECT e.*, u.name AS paid_by_name FROM expenses e
@@ -68,10 +69,10 @@ export const getTripExpenses = (req, res) => {
       .status(200)
       .json(new ApiResponse(200, results, "Get all trip expenses"));
   });
-};
+});
 
 // Get Trip Summary (Balances)
-export const getTripSummary = (req, res) => {
+export const getTripSummary = asyncHandler(async (req, res) => {
   const { tripId } = req.params;
   const query = `
     SELECT 
@@ -90,7 +91,7 @@ export const getTripSummary = (req, res) => {
 
     // Transform raw results into a { [userId]: { owes: [{toUser, amount}] } } structure
     const summary = {};
-    results.forEach(r => {
+    results.forEach((r) => {
       if (r.user_id === r.paid_by) return; // skip self
       if (!summary[r.user_id]) summary[r.user_id] = [];
       summary[r.user_id].push({
@@ -101,5 +102,4 @@ export const getTripSummary = (req, res) => {
 
     res.status(200).json(new ApiResponse(200, summary, "Expense summary"));
   });
-};
-
+});
