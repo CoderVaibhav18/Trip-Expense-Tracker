@@ -71,7 +71,7 @@ export const addTripMember = asyncHandler((req, res) => {
 
   const query = `INSERT INTO trip_members (trip_id, user_id) VALUES (?, ?)`;
   db.query(query, [tripId, userId], (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: "Member added" });
+    if (err) throw new ApiError(500, err.message);
+    res.json(new ApiResponse(200, {}, "Member added" ));
   });
 });

@@ -1,5 +1,7 @@
 import db from "../config/db.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 export const recordRepayment = asyncHandler((req, res) => {
   const { tripId } = req.params;
@@ -12,8 +14,10 @@ export const recordRepayment = asyncHandler((req, res) => {
   `;
 
   db.query(query, [tripId, paidFrom, paidTo, amount], (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.status(201).json({ message: "Repayment recorded successfully." });
+    if (err) throw new ApiError(500, err.message);
+    return res
+      .status(201)
+      .json(new ApiResponse(201, {}, "Repayment recorded successfully."));
   });
 });
 
@@ -30,7 +34,15 @@ export const getRepaymentHistory = asyncHandler((req, res) => {
   `;
 
   db.query(query, [tripId], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ repayments: results });
+    if (err) throw new ApiError(500, err.message);
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { repayments: results },
+          "Get history successfully"
+        )
+      );
   });
 });

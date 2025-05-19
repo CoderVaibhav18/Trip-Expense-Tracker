@@ -1,4 +1,5 @@
 import db from "../config/db.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const calculateBalances = asyncHandler((req, res) => {
@@ -19,7 +20,7 @@ export const calculateBalances = asyncHandler((req, res) => {
   `;
 
   db.query(query, [tripId, tripId, tripId], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) throw new ApiError(500, err.message);
 
     const balances = results.map((user) => ({
       user_id: user.user_id,
@@ -29,8 +30,10 @@ export const calculateBalances = asyncHandler((req, res) => {
       balance: parseFloat(user.total_paid - user.total_share),
     }));
 
-    console.log(balances);
-
-    res.json({ balances });
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, { balances }, "Calculate Balances successfully")
+      );
   });
 });
