@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 export const recordRepayment = asyncHandler((req, res) => {
   const { tripId } = req.params;
   const paidFrom = req.user.userId;
-  const { paidTo, amount } = req.body;
+  const { paidTo, amount } = req.body
 
   const query = `
     INSERT INTO repayments (trip_id, paid_from, paid_to, amount)
