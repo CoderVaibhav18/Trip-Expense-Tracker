@@ -3,12 +3,16 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 const app = express();
 
+app.use(cors(({
+  origin: '*',
+  credentials: true
+})));
+
 app.use(json({ limit: "16kb" }));
 app.use(urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
 app.use(express.static("public"));
 app.use(cookieParser());
-app.use(cors());
 
 app.route("/").get((req, res) => {
   res.send("Server started");
