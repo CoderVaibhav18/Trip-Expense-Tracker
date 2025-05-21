@@ -7,8 +7,8 @@ const Dashboard = () => {
   const [balances, setBalances] = useState([]);
 
   useEffect(() => {
-    API.get(`/balance/${tripId}/balance`).then(res => {
-      setBalances(res.data.balances);
+    API.get(`/balance/${tripId}/balance`).then(res => {      
+      setBalances(res.data.data.balances);
     });
   }, [tripId]);
 
@@ -18,7 +18,9 @@ const Dashboard = () => {
       <ul className="bg-white shadow rounded-lg divide-y">
         {balances.map((b) => (
           <li key={b.user_id} className="p-4 flex justify-between">
-            <span>{b.username}</span>
+            <span>{b.name}</span>
+            <span>{b.total_paid}</span>
+            <span>{b.total_share}</span>
             <span className={`${b.balance > 0 ? 'text-green-600' : 'text-red-600'}`}>
               ₹{b.balance.toFixed(2)}
             </span>

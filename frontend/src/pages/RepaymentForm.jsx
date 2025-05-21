@@ -1,24 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import API from '../api/api';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import API from "../api/api";
 
 const RepaymentForm = () => {
   const { tripId } = useParams();
   const [users, setUsers] = useState([]);
-  const [paidTo, setPaidTo] = useState('');
-  const [amount, setAmount] = useState('');
+  const [paidTo, setPaidTo] = useState("");
+  const [amount, setAmount] = useState("");
 
   useEffect(() => {
-    API.get(`/trip/${tripId}/members`).then(res => {
-      setUsers(res.data.users); // Assume backend gives trip users
+    API.get(`/trip/${tripId}/members`).then((res) => {
+      console.log(res.data.data);
+
+      setUsers(res.data.data); // Assume backend gives trip users
     });
   }, [tripId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await API.post(`/repayment/${tripId}`, { paidTo, amount });
-    alert('Repayment recorded!');
-    setAmount('');
+    alert("Repayment recorded!");
+    setAmount("");
   };
 
   return (
@@ -32,7 +34,9 @@ const RepaymentForm = () => {
         >
           <option>Select person to repay</option>
           {users.map((user) => (
-            <option value={user.id} key={user.id}>{user.username}</option>
+            <option value={user.id} key={user.id}>
+              {user.name}
+            </option>
           ))}
         </select>
         <input

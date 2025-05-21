@@ -8,7 +8,8 @@ const RepaymentHistory = () => {
 
   useEffect(() => {
     API.get(`/repayment/${tripId}`).then(res => {
-      setRepayments(res.data.repayments);
+      console.log(res.data.data.repayments);
+      setRepayments(res.data.data.repayments);
     });
   }, [tripId]);
 
@@ -18,7 +19,7 @@ const RepaymentHistory = () => {
       <ul className="bg-white shadow rounded-lg divide-y">
         {repayments.map((r) => (
           <li key={r.id} className="p-4">
-            <p><b>{r.fromUser}</b> paid <b>{r.toUser}</b> ₹{r.amount}</p>
+            <p><b>{r.fromUser}</b> paid to <b>{r.toUser}</b> ₹{r.amount}</p>
             <p className="text-sm text-gray-500">{new Date(r.timestamp).toLocaleString()}</p>
           </li>
         ))}
