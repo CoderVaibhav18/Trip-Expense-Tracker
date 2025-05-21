@@ -28,9 +28,7 @@ export const register = asyncHandler(async (req, res) => {
       (err, result) => {
         if (err) throw new err();
         console.log("user register");
-        return res
-          .status(201)
-          .json(new ApiResponse(201, {}, "User register successfully"));
+        return res.status(201).json({ meggage: "User register successfully"});
       }
     );
   });
