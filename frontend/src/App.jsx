@@ -8,15 +8,32 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Error from "./pages/Error";
+import UserProtectedWrapper from "./auth/UserProtectedWrapper";
+import Logout from "./pages/Logout";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route
+          path="/"
+          element={
+            <UserProtectedWrapper>
+              <Home />
+            </UserProtectedWrapper>
+          }
+        />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/logout"
+          element={
+            <UserProtectedWrapper>
+              <Logout />
+            </UserProtectedWrapper>
+          }
+        />
+        <Route path="/about" element={<About />} />
         <Route path="/dashboard/:tripId" element={<Dashboard />} />
         <Route path="/repay/:tripId" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />

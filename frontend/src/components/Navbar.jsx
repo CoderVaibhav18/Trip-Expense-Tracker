@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { HiBars3BottomRight } from "react-icons/hi2";
 import { RxCross2 } from "react-icons/rx";
 import { FiLogOut } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -12,9 +12,11 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate()
 
   const handleLogout = () => {
     // Add your logout logic here
+    navigate('/logout')
     alert("Logged out!");
   };
 
@@ -39,7 +41,7 @@ const Navbar = () => {
           {!open ? <HiBars3BottomRight /> : <RxCross2 />}
         </button>
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.to}
