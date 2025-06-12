@@ -13,7 +13,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-md w-full relative z-40">
-      <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-3">
+      <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
         <div className="font-bold text-lg text-gray-800">
           Trip Expense Tracker
         </div>
