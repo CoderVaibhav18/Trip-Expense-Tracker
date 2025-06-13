@@ -4,7 +4,7 @@ import API from "../api/api";
 
 const UserProtectedWrapper = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const UserProtectedWrapper = ({ children }) => {
     })
     .catch((err) => {
       console.error(err);
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
       navigate("/login");
     });
 
