@@ -28,7 +28,7 @@ export const register = asyncHandler(async (req, res) => {
       (err, result) => {
         if (err) throw new err();
         console.log("user register");
-        return res.status(201).json({ meggage: "User register successfully"});
+        return res.status(201).json({ meggage: "User register successfully" });
       }
     );
   });
@@ -82,3 +82,12 @@ export const profile = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, req.user, "profile"));
 });
 
+export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie("accessToken");
+  const token =
+    req.cookies?.accessToken ||
+    req.header("Authorization")?.replace("Bearer ", "");
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Logged out successfully"));
+});
