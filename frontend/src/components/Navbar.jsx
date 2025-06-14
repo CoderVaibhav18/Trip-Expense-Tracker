@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { HiBars3BottomRight } from "react-icons/hi2";
 import { RxCross2 } from "react-icons/rx";
-import { FiLogOut } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 
 const navLinks = [
   { to: "/", label: "Home" },
+  { to: "/project", label: "Project" },
   { to: "/expenses", label: "Expenses" },
   { to: "/about", label: "About" },
 ];

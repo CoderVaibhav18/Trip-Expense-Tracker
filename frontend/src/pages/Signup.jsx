@@ -1,6 +1,6 @@
 import { useState } from "react";
 import API from "../api/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
@@ -171,12 +171,12 @@ const Signup = () => {
         </form>
         <div className="mt-6 text-center text-gray-500 text-sm">
           Already have an account?{" "}
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className="text-blue-600 hover:underline font-medium"
           >
             Login
-          </a>
+          </Link>
         </div>
       </div>
       <style>

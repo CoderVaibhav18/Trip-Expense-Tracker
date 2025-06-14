@@ -82,6 +82,18 @@ export const profile = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, req.user, "profile"));
 });
 
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const userId = req.user.userId;
+  const query = `SELECT * FROM users WHERE id != ?`;
+  db.query(query, [userId], async (err, results) => {
+    if (err || results.length === 0) {
+      throw new ApiError(401, "Invalid credential");
+    }
+
+    return res.status(200).json(new ApiResponse(200, results, "All users"));
+  });
+});
+
 export const logout = asyncHandler(async (req, res) => {
   res.clearCookie("accessToken");
   const token =

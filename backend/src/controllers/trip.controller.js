@@ -34,7 +34,7 @@ export const createTrip = asyncHandler((req, res) => {
 
 // Get trips for logged-in user
 export const getMyTrips = asyncHandler((req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user.userId;  
   const query = `
     SELECT t.* FROM trips t
     JOIN trip_members tm ON t.id = tm.trip_id
@@ -43,6 +43,7 @@ export const getMyTrips = asyncHandler((req, res) => {
 
   db.query(query, [userId], (err, results) => {
     if (err) throw new ApiError(500, err.message);
+    
     return res.status(200).json(new ApiResponse(200, results, "Get my trips"));
   });
 });

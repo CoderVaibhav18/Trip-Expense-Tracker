@@ -10,6 +10,7 @@ import About from "./pages/About";
 import Error from "./pages/Error";
 import UserProtectedWrapper from "./auth/UserProtectedWrapper";
 import Logout from "./pages/Logout";
+import Project from "./pages/Project";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           }
         />
         <Route path="/about" element={<About />} />
+        <Route path="/project" element={<Project />} />
         <Route path="/dashboard/:tripId" element={<Dashboard />} />
         <Route path="/repay/:tripId" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />
