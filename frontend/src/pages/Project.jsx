@@ -5,7 +5,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FiX, FiUserPlus, FiUsers, FiEye } from "react-icons/fi";
 import MembersPanel from "../components/MembersPanel";
-import UserSearch from "../components/UserSearch"; // Suggested new component
+import UserSearch from "../components/UserSearch";
+import AddMembersModal from "../components/AddMembersModal.jsx"; // New component
 
 const ProjectSection = () => {
   // State management
@@ -20,8 +21,8 @@ const ProjectSection = () => {
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState(null);
+  const [addingMembersProject, setAddingMembersProject] = useState(null); // New state for adding members
   
-
   // Memoized user list for better performance
   const filteredUsers = useMemo(() => {
     return allUsers.filter(
@@ -86,6 +87,20 @@ const ProjectSection = () => {
 
   const handleRemoveMember = useCallback((id) => {
     setMembers((prev) => prev.filter((member) => member.id !== id));
+  }, []);
+
+  // Refresh projects data
+  const refreshProjects = useCallback(async () => {
+    try {
+      const response = await API.get("/trip/my-trips", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      setProjects(response.data.data);
+    } catch (err) {
+      setError("Failed to refresh projects: " + (err.response?.data?.message || err.message));
+    }
   }, []);
 
   // Data fetching
@@ -236,36 +251,53 @@ const ProjectSection = () => {
                 key={project.id}
                 className="bg-blue-50 border border-blue-100 rounded-lg p-5 flex flex-col shadow hover:shadow-md transition-shadow duration-150"
               >
-                <Link
-                  to={`/trip/${project.id}`}
-                  className="flex items-center justify-between mb-2"
-                >
-                  <span className="text-lg font-semibold text-blue-700">
-                    {project.name}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(project.created_at).toLocaleDateString()}
-                  </span>
+                <Link to={`/trip/${project.id}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-lg font-semibold text-blue-700">
+                      {project.name}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(project.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-500 mb-1">
+                    {project.description}
+                  </div>
                 </Link>
-                <div className="text-sm text-gray-500 mb-1">
-                  {project.description}
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => setActiveProjectId(project)}
+                    className="flex items-center justify-center gap-1 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs transition w-max"
+                  >
+                    <FiEye size={14} /> Show Members
+                  </button>
+                  <button
+                    onClick={() => setAddingMembersProject(project)}
+                    className="flex items-center justify-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs transition w-max"
+                  >
+                    <FiUserPlus size={14} /> Add members
+                  </button>
                 </div>
-                <button
-                  onClick={() => setActiveProjectId(project)}
-                  className="flex items-center justify-center gap-1 px-3 py-1 bg-blue-600 mt-2 text-white rounded hover:bg-blue-700 text-xs transition w-max"
-                >
-                  <FiEye size={14} /> Show Members
-                </button>
               </div>
             ))
           )}
         </div>
 
-        {/* Members panel outside the loop */}
+        {/* Members panel for viewing members */}
         {activeProjectId && (
           <MembersPanel
             project={activeProjectId}
             onClose={() => setActiveProjectId(null)}
+          />
+        )}
+
+        {/* Modal for adding members to existing trips */}
+        {addingMembersProject && (
+          <AddMembersModal
+            project={addingMembersProject}
+            allUsers={allUsers}
+            onClose={() => setAddingMembersProject(null)}
+            onMemberAdded={refreshProjects}
           />
         )}
 
