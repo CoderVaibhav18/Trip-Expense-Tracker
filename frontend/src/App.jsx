@@ -35,7 +35,7 @@ function App() {
           }
         />
         <Route path="/about" element={<About />} />
-        <Route path="/project" element={<Project />} />
+        <Route path="/trip" element={<Project />} />
         <Route path="/dashboard/:tripId" element={<Dashboard />} />
         <Route path="/repay/:tripId" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />

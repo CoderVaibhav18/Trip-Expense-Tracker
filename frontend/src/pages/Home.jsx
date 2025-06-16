@@ -18,7 +18,7 @@ const Home = () => {
             stress-free!
           </p>
           <Link
-            to="/"
+            to="/trip"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded transition-colors duration-200 shadow"
           >
             Get Started

@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const navLinks = [
   { to: "/", label: "Home" },
-  { to: "/project", label: "Project" },
+  { to: "/trip", label: "Trip" },
   { to: "/expenses", label: "Expenses" },
   { to: "/about", label: "About" },
 ];
@@ -42,9 +42,9 @@ const Navbar = () => {
         </button>
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {navLinks.map((link, idx) => (
             <Link
-              key={link.to}
+              key={idx}
               to={link.to}
               className={linkClass}
             >
