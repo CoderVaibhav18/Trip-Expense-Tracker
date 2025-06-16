@@ -1,26 +1,47 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import API from "../api/api";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { FiX, FiPlus, FiUserPlus, FiUsers } from "react-icons/fi";
+import { FiX, FiUserPlus, FiUsers, FiEye } from "react-icons/fi";
+import MembersPanel from "../components/MembersPanel";
+import UserSearch from "../components/UserSearch"; // Suggested new component
 
 const ProjectSection = () => {
+  // State management
   const [projects, setProjects] = useState([]);
-  const [projectName, setProjectName] = useState("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+  });
   const [error, setError] = useState("");
   const [allUsers, setAllUsers] = useState([]);
   const [members, setMembers] = useState([]);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeProjectId, setActiveProjectId] = useState(null);
+  
 
-  // Memoized API call handler
+  // Memoized user list for better performance
+  const filteredUsers = useMemo(() => {
+    return allUsers.filter(
+      (user) => !members.some((member) => member.id === user.id)
+    );
+  }, [allUsers, members]);
+
+  // Combined form handler
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Project creation with optimized request
   const handleCreateProject = useCallback(
     async (e) => {
       e.preventDefault();
-      if (!projectName.trim() || !description.trim()) {
-        setError("Project name and description are required");
+
+      if (!formData.name.trim() || !formData.description.trim()) {
+        setError("Trip name and description are required");
         return;
       }
 
@@ -31,8 +52,8 @@ const ProjectSection = () => {
         const response = await API.post(
           "/trip/create",
           {
-            name: projectName,
-            description: description,
+            name: formData.name,
+            description: formData.description,
             memberIds: members.map((user) => user.id),
           },
           {
@@ -43,19 +64,18 @@ const ProjectSection = () => {
         );
 
         setProjects((prev) => [...prev, response.data]);
-        setProjectName("");
-        setDescription("");
+        setFormData({ name: "", description: "" });
         setMembers([]);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to create project");
+        setError(err.response?.data?.message || "Failed to create trip");
       } finally {
         setIsSubmitting(false);
       }
     },
-    [projectName, description, members]
+    [formData, members]
   );
 
-  // Optimized member handling
+  // Member management
   const handleAddMember = useCallback((user) => {
     setMembers((prev) =>
       prev.some((member) => member.id === user.id)
@@ -68,7 +88,7 @@ const ProjectSection = () => {
     setMembers((prev) => prev.filter((member) => member.id !== id));
   }, []);
 
-  // Combined API calls with error handling
+  // Data fetching
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -88,12 +108,14 @@ const ProjectSection = () => {
         setProjects(projectsRes.data.data);
         setAllUsers(usersRes.data.data);
       } catch (err) {
-        setError("Failed to load data", err);
+        setError(
+          "Failed to load data: " + (err.response?.data?.message || err.message)
+        );
       }
     };
 
     fetchData();
-  }, [isSubmitting]);
+  }, []);
 
   return (
     <>
@@ -107,19 +129,20 @@ const ProjectSection = () => {
           onSubmit={handleCreateProject}
           className="flex flex-col gap-4 mb-8"
         >
-          {/* ... (form inputs remain same) ... */}
           <input
             type="text"
+            name="name"
             placeholder="Enter new trip name"
             className="p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-            value={projectName}
-            onChange={(e) => setProjectName(e.target.value)}
+            value={formData.name}
+            onChange={handleInputChange}
           />
           <textarea
+            name="description"
             placeholder="Trip description"
             className="p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={formData.description}
+            onChange={handleInputChange}
             rows={2}
           />
 
@@ -157,25 +180,13 @@ const ProjectSection = () => {
                 <div className="mb-2 text-blue-700 font-semibold text-center">
                   Select members to add
                 </div>
-                <div className="max-h-56 overflow-y-auto flex flex-col gap-2">
-                  {allUsers.map((user) => (
-                    <button
-                      key={user.id}
-                      type="button"
-                      className="flex items-center justify-between bg-gradient-to-r from-cyan-100 via-blue-50 to-white border border-cyan-200 text-cyan-700 hover:bg-cyan-200 hover:text-cyan-900 font-medium px-4 py-2 rounded-lg shadow-sm transition-colors duration-150"
-                      onClick={() => handleAddMember(user)}
-                    >
-                      <span className="truncate">{user.name}</span>
-                      <span className="ml-2 text-xs text-gray-500 truncate">
-                        {user.email}
-                      </span>
-                      <FiPlus className="ml-2" />
-                    </button>
-                  ))}
-                </div>
+
+                {/* Replaced with optimized search component */}
+                <UserSearch users={filteredUsers} onSelect={handleAddMember} />
+
                 <button
                   type="button"
-                  className="mt-4 bg-gradient-to-r from-gray-200 via-gray-100 to-white border border-gray-300 text-gray-700 hover:bg-gray-300 hover:text-gray-900 font-medium px-4 py-2 rounded-lg shadow-sm transition-colors duration-150"
+                  className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors"
                   onClick={() => setIsAddingMember(false)}
                 >
                   Close
@@ -199,61 +210,78 @@ const ProjectSection = () => {
               isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:scale-105"
             }`}
           >
-            {isSubmitting ? "Creating..." : "Create Project"}
+            {isSubmitting ? "Creating..." : "Create Trip"}
           </button>
         </form>
 
-        {/* ... (rest of the component remains same) ... */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 rounded px-4 py-2 mb-4 text-sm text-center">
             {error}
           </div>
         )}
+
         <div className="mb-4 text-gray-600 text-center">
           Total Trips:{" "}
           <span className="font-bold text-blue-600">{projects.length}</span>
         </div>
+
         <div className="grid md:grid-cols-2 gap-6">
           {projects.length === 0 ? (
             <div className="col-span-2 text-center text-gray-400 py-8">
               No trips created yet.
             </div>
           ) : (
-            projects.map((project, idx) => (
-              <Link
-                key={idx}
-                to="/"
+            projects.map((project) => (
+              <div
+                key={project.id}
                 className="bg-blue-50 border border-blue-100 rounded-lg p-5 flex flex-col shadow hover:shadow-md transition-shadow duration-150"
               >
-                <div className="flex items-center justify-between mb-2">
+                <Link
+                  to={`/trip/${project.id}`}
+                  className="flex items-center justify-between mb-2"
+                >
                   <span className="text-lg font-semibold text-blue-700">
                     {project.name}
                   </span>
                   <span className="text-xs text-gray-400">
                     {new Date(project.created_at).toLocaleDateString()}
                   </span>
-                </div>
+                </Link>
                 <div className="text-sm text-gray-500 mb-1">
                   {project.description}
                 </div>
-              </Link>
+                <button
+                  onClick={() => setActiveProjectId(project)}
+                  className="flex items-center justify-center gap-1 px-3 py-1 bg-blue-600 mt-2 text-white rounded hover:bg-blue-700 text-xs transition w-max"
+                >
+                  <FiEye size={14} /> Show Members
+                </button>
+              </div>
             ))
           )}
         </div>
+
+        {/* Members panel outside the loop */}
+        {activeProjectId && (
+          <MembersPanel
+            project={activeProjectId}
+            onClose={() => setActiveProjectId(null)}
+          />
+        )}
+
         <div className="mt-10 bg-gradient-to-tr from-blue-100 via-cyan-50 to-blue-50 rounded-lg p-6 text-center">
           <h3 className="text-xl font-semibold text-blue-700 mb-2">
             Why create a trip?
           </h3>
           <p className="text-gray-600 mb-2">
-            Trips help you organize your trips and group expenses
-            efficiently. Each project can represent a trip, event, or group
-            activity.
+            Trips help you organize your group expenses efficiently. Each trip
+            can represent a vacation, event, or shared activity.
           </p>
           <ul className="text-gray-500 text-left max-w-md mx-auto mb-2 space-y-1">
             <li>• Track all expenses for a specific trip in one place</li>
             <li>• Easily add and manage group members</li>
             <li>• Get a clear summary of who owes what</li>
-            <li>• Keep your travel finances transparent and organized</li>
+            <li>• Keep travel finances transparent and organized</li>
           </ul>
           <p className="text-blue-500 font-medium mt-2">
             Start by creating your first trip above!
