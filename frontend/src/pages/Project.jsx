@@ -93,14 +93,14 @@ const ProjectSection = () => {
     };
 
     fetchData();
-  }, []);
+  }, [isSubmitting]);
 
   return (
     <>
       <Navbar />
       <section className="max-w-3xl mx-auto mt-10 px-4 py-8 bg-white rounded-xl shadow-lg">
         <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-6 text-center">
-          Your Projects
+          Your Trips
         </h2>
 
         <form
@@ -110,13 +110,13 @@ const ProjectSection = () => {
           {/* ... (form inputs remain same) ... */}
           <input
             type="text"
-            placeholder="Enter new project name"
+            placeholder="Enter new trip name"
             className="p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
           />
           <textarea
-            placeholder="Project description"
+            placeholder="Trip description"
             className="p-3 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -210,13 +210,13 @@ const ProjectSection = () => {
           </div>
         )}
         <div className="mb-4 text-gray-600 text-center">
-          Total Projects:{" "}
+          Total Trips:{" "}
           <span className="font-bold text-blue-600">{projects.length}</span>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           {projects.length === 0 ? (
             <div className="col-span-2 text-center text-gray-400 py-8">
-              No projects created yet.
+              No trips created yet.
             </div>
           ) : (
             projects.map((project, idx) => (
@@ -242,10 +242,10 @@ const ProjectSection = () => {
         </div>
         <div className="mt-10 bg-gradient-to-tr from-blue-100 via-cyan-50 to-blue-50 rounded-lg p-6 text-center">
           <h3 className="text-xl font-semibold text-blue-700 mb-2">
-            Why create a project?
+            Why create a trip?
           </h3>
           <p className="text-gray-600 mb-2">
-            Projects help you organize your trips and group expenses
+            Trips help you organize your trips and group expenses
             efficiently. Each project can represent a trip, event, or group
             activity.
           </p>
@@ -256,7 +256,7 @@ const ProjectSection = () => {
             <li>• Keep your travel finances transparent and organized</li>
           </ul>
           <p className="text-blue-500 font-medium mt-2">
-            Start by creating your first project above!
+            Start by creating your first trip above!
           </p>
         </div>
       </section>
