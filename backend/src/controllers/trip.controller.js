@@ -65,6 +65,40 @@ export const getTripMembers = asyncHandler((req, res) => {
   });
 });
 
+export const getTripDetail = asyncHandler((req, res) => {
+  const { tripId } = req.params;
+
+  const tripQuery = `SELECT id, name, created_at FROM trips WHERE id = ?`;
+  db.query(tripQuery, [tripId], (tripErr, tripResults) => {
+    if (tripErr) throw new ApiError(500, tripErr.message);
+
+    if (tripResults.length === 0) {
+      throw new ApiError(404, "Trip not found");
+    }
+
+    const trip = tripResults[0];
+
+    const membersQuery = `
+      SELECT u.id, u.name, u.email FROM users u
+      JOIN trip_members tm ON u.id = tm.user_id
+      WHERE tm.trip_id = ?
+    `;
+
+    db.query(membersQuery, [tripId], (memberErr, memberResults) => {
+      if (memberErr) throw new ApiError(500, memberErr.message);
+
+      const responseData = {
+        trip,
+        members: memberResults
+      };
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, responseData, "Trip detail fetched"));
+    });
+  });
+});
+
 // Add a member to a trip
 export const addTripMember = asyncHandler((req, res) => {
   const { tripId } = req.params;

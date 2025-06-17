@@ -9,7 +9,7 @@ export const addExpense = asyncHandler(async (req, res) => {
   const { amount, description } = req.body;
   const selectedMembers = JSON.parse(req.body.members);
   const paidBy = req.user.userId;
-  
+
   const imageUrl = req.file ? req.file.path : null;
 
   // Step 1: Insert expense into the `expenses` table
@@ -22,17 +22,21 @@ export const addExpense = asyncHandler(async (req, res) => {
       const expenseId = result.insertId;
 
       // Step 2: Ensure selectedMembers is valid
-      if (!selectedMembers || !Array.isArray(selectedMembers) || selectedMembers.length === 0) {
+      if (
+        !selectedMembers ||
+        !Array.isArray(selectedMembers) ||
+        selectedMembers.length === 0
+      ) {
         throw new ApiError(400, "selectedMembers must be a non-empty array");
       }
 
       // Step 3: Calculate share and create split entries
       const share = parseFloat((amount / selectedMembers.length).toFixed(2));
-      const splits = selectedMembers.map(user_id => [
+      const splits = selectedMembers.map((user_id) => [
         expenseId,
         user_id,
         share,
-        false
+        false,
       ]);
 
       // Step 4: Insert splits into expense_splits
@@ -43,28 +47,70 @@ export const addExpense = asyncHandler(async (req, res) => {
           if (err2) throw new ApiError(500, err2.message);
           return res
             .status(201)
-            .json(new ApiResponse(201, expenseId, "Expense added and split among selected members"));
+            .json(
+              new ApiResponse(
+                201,
+                expenseId,
+                "Expense added and split among selected members"
+              )
+            );
         }
       );
     }
   );
 });
 
-
 //  Get Trip Expenses
 export const getTripExpenses = asyncHandler(async (req, res) => {
   const { tripId } = req.params;
+
   const query = `
-    SELECT e.*, u.name AS paid_by_name FROM expenses e
+    SELECT 
+      e.id,
+      e.trip_id,
+      e.amount,
+      e.description,
+      e.image_url,
+      e.paid_by,
+      e.date,
+      u.name AS paid_by_name,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id', m.id,
+          'name', m.name,
+          'email', m.email
+        )
+      ) AS members
+    FROM expenses e
     JOIN users u ON e.paid_by = u.id
+    LEFT JOIN expense_splits em ON e.id = em.expense_id
+    LEFT JOIN users m ON em.user_id = m.id
     WHERE e.trip_id = ?
+    GROUP BY e.id
     ORDER BY e.date DESC
   `;
+
   db.query(query, [tripId], (err, results) => {
     if (err) throw new ApiError(500, err.message);
+
+    console.log(results);
+    
+
+    // Parse the JSON arrays for members before sending
+    const parsedResults = results.map((expense) => ({
+      ...expense,
+      members: expense.members,
+    }));
+
     return res
       .status(200)
-      .json(new ApiResponse(200, results, "Get all trip expenses"));
+      .json(
+        new ApiResponse(
+          200,
+          parsedResults,
+          "Get all trip expenses with members"
+        )
+      );
   });
 });
 

@@ -12,6 +12,7 @@ import UserProtectedWrapper from "./auth/UserProtectedWrapper";
 import Logout from "./pages/Logout";
 import Project from "./pages/Project";
 import AddExpense from "./pages/AddExpense";
+import TripExpenses from "./components/TripExpenses";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/trip" element={<Project />} />
         <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
+        <Route path="/trip/:tripId/expenses" element={<TripExpenses />} />
         <Route path="/repay/:tripId" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />
         <Route path="*" element={<Error />} />

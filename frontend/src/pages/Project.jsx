@@ -22,7 +22,7 @@ const ProjectSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState(null);
   const [addingMembersProject, setAddingMembersProject] = useState(null); // New state for adding members
-  
+
   // Memoized user list for better performance
   const filteredUsers = useMemo(() => {
     return allUsers.filter(
@@ -99,7 +99,10 @@ const ProjectSection = () => {
       });
       setProjects(response.data.data);
     } catch (err) {
-      setError("Failed to refresh projects: " + (err.response?.data?.message || err.message));
+      setError(
+        "Failed to refresh projects: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   }, []);
 
@@ -251,7 +254,7 @@ const ProjectSection = () => {
                 key={project.id}
                 className="bg-blue-50 border border-blue-100 rounded-lg p-5 flex flex-col shadow hover:shadow-md transition-shadow duration-150"
               >
-                <Link to={`/trip/${project.id}/add-expense`}>
+                <Link to={`/trip/${project.id}/expenses`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-lg font-semibold text-blue-700">
                       {project.name}
