@@ -7,11 +7,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 export const addExpense = asyncHandler(async (req, res) => {
   const { tripId } = req.params;
   const { amount, description } = req.body;
+  const selectedMembers = JSON.parse(req.body.members);
   const paidBy = req.user.userId;
-
+  
   const imageUrl = req.file ? req.file.path : null;
 
-  // Step 1: Insert into expenses
+  // Step 1: Insert expense into the `expenses` table
   db.query(
     `INSERT INTO expenses (trip_id, paid_by, amount, description, image_url) VALUES (?, ?, ?, ?, ?)`,
     [tripId, paidBy, amount, description, imageUrl],
@@ -20,39 +21,35 @@ export const addExpense = asyncHandler(async (req, res) => {
 
       const expenseId = result.insertId;
 
-      // Step 2: Get trip members
+      // Step 2: Ensure selectedMembers is valid
+      if (!selectedMembers || !Array.isArray(selectedMembers) || selectedMembers.length === 0) {
+        throw new ApiError(400, "selectedMembers must be a non-empty array");
+      }
+
+      // Step 3: Calculate share and create split entries
+      const share = parseFloat((amount / selectedMembers.length).toFixed(2));
+      const splits = selectedMembers.map(user_id => [
+        expenseId,
+        user_id,
+        share,
+        false
+      ]);
+
+      // Step 4: Insert splits into expense_splits
       db.query(
-        `SELECT user_id FROM trip_members WHERE trip_id = ?`,
-        [tripId],
-        (err2, members) => {
+        `INSERT INTO expense_splits (expense_id, user_id, share_amount, is_settled) VALUES ?`,
+        [splits],
+        (err2) => {
           if (err2) throw new ApiError(500, err2.message);
-
-          const share = (amount / members.length).toFixed(2);
-          const splits = members.map(({ user_id }) => [
-            expenseId,
-            user_id,
-            share,
-            false,
-          ]);
-
-          // Step 3: Insert into expense_splits
-          db.query(
-            `INSERT INTO expense_splits (expense_id, user_id, share_amount, is_settled) VALUES ?`,
-            [splits],
-            (err3) => {
-              if (err3) throw new ApiError(500, err3.message);
-              return res
-                .status(201)
-                .json(
-                  new ApiResponse(201, expenseId, "Expense added and split")
-                );
-            }
-          );
+          return res
+            .status(201)
+            .json(new ApiResponse(201, expenseId, "Expense added and split among selected members"));
         }
       );
     }
   );
 });
+
 
 //  Get Trip Expenses
 export const getTripExpenses = asyncHandler(async (req, res) => {

@@ -251,7 +251,7 @@ const ProjectSection = () => {
                 key={project.id}
                 className="bg-blue-50 border border-blue-100 rounded-lg p-5 flex flex-col shadow hover:shadow-md transition-shadow duration-150"
               >
-                <Link to={`/trip/${project.id}`}>
+                <Link to={`/trip/${project.id}/add-expense`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-lg font-semibold text-blue-700">
                       {project.name}

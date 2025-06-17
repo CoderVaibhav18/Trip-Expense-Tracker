@@ -11,6 +11,7 @@ import Error from "./pages/Error";
 import UserProtectedWrapper from "./auth/UserProtectedWrapper";
 import Logout from "./pages/Logout";
 import Project from "./pages/Project";
+import AddExpense from "./pages/AddExpense";
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
         />
         <Route path="/about" element={<About />} />
         <Route path="/trip" element={<Project />} />
-        <Route path="/trip/:tripId" element={<Dashboard />} />
+        <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
         <Route path="/repay/:tripId" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />
         <Route path="*" element={<Error />} />
