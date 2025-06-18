@@ -41,7 +41,10 @@ function App() {
         <Route path="/trip/:tripId/expenses" element={<TripExpenses />} />
         <Route path="/balance/:tripId" element={<TripBalance />} />
         <Route path="/repay/:tripId/:tripName" element={<RepaymentForm />} />
-        <Route path="/repayments/:tripId" element={<RepaymentHistory />} />
+        <Route
+          path="/repay-history/:tripId/:tripName"
+          element={<RepaymentHistory />}
+        />
         <Route path="*" element={<Error />} />
       </Routes>
     </Router>

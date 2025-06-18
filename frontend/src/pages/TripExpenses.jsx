@@ -171,6 +171,12 @@ const TripExpenses = () => {
           >
             Repayment
           </Link>
+          <Link
+            to={`/repay-history/${tripId}/${tripDetails?.trip?.name}`}
+            className="py-3 px-4 md:px-6 font-medium text-gray-500 hover:text-blue-500 transition-colors"
+          >
+            History
+          </Link>
         </div>
 
         {/* Summary Card */}
