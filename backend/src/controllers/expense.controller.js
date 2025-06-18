@@ -117,32 +117,49 @@ export const getTripExpenses = asyncHandler(async (req, res) => {
 // Get Trip Summary (Balances)
 export const getTripSummary = asyncHandler(async (req, res) => {
   const { tripId } = req.params;
+
   const query = `
     SELECT 
       es.user_id,
-      SUM(es.share_amount) AS total_owed,
+      u1.name AS user_name,
       e.paid_by,
+      u2.name AS paid_by_name,
       SUM(CASE WHEN es.user_id != e.paid_by THEN es.share_amount ELSE 0 END) AS owes_to_payer
     FROM expense_splits es
     JOIN expenses e ON es.expense_id = e.id
+    JOIN users u1 ON es.user_id = u1.id
+    JOIN users u2 ON e.paid_by = u2.id
     WHERE e.trip_id = ?
-    GROUP BY es.user_id, e.paid_by
+    GROUP BY es.user_id, e.paid_by;
   `;
 
   db.query(query, [tripId], (err, results) => {
     if (err) throw new ApiError(500, err.message);
 
-    // Transform raw results into a { [userId]: { owes: [{toUser, amount}] } } structure
+    // Transform into structure: { user_id: { name, owes: [ { toUser, toUserName, amount } ] } }
     const summary = {};
+
     results.forEach((r) => {
-      if (r.user_id === r.paid_by) return; // skip self
-      if (!summary[r.user_id]) summary[r.user_id] = [];
-      summary[r.user_id].push({
-        owesTo: r.paid_by,
-        amount: Number(r.owes_to_payer),
+      if (r.user_id === r.paid_by) return; // Skip self payments
+
+      if (!summary[r.user_id]) {
+        summary[r.user_id] = {
+          user_id: r.user_id,
+          user_name: r.user_name,
+          owes: []
+        };
+      }
+
+      summary[r.user_id].owes.push({
+        to_user_id: r.paid_by,
+        to_user_name: r.paid_by_name,
+        amount: Number(r.owes_to_payer)
       });
     });
 
-    res.status(200).json(new ApiResponse(200, summary, "Expense summary"));
+    res.status(200).json(
+      new ApiResponse(200, Object.values(summary), "Trip summary with user names")
+    );
   });
 });
+
