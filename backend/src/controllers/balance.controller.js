@@ -26,7 +26,9 @@ export const calculateBalances = asyncHandler((req, res) => {
     if (err) throw new ApiError(500, err.message);
 
     if (!results.length) {
-      return res.status(404).json(new ApiResponse(404, {}, "Trip not found or has no members"));
+      return res
+        .status(404)
+        .json(new ApiResponse(404, {}, "Trip not found or has no members"));
     }
 
     const tripName = results[0].trip_name;
@@ -48,7 +50,48 @@ export const calculateBalances = asyncHandler((req, res) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, { trip_name: tripName, balances }, "Trip balances calculated")
+        new ApiResponse(
+          200,
+          { trip_name: tripName, balances },
+          "Trip balances calculated"
+        )
       );
   });
 });
+
+export const getTripPayeesWithOwedAmount = asyncHandler((req, res) => {
+  const { tripId } = req.params;
+
+  const query = `
+    SELECT 
+      u.id AS user_id,
+      u.name,
+      SUM(e.amount) AS total_paid,
+      SUM(CASE 
+            WHEN es.user_id != e.paid_by THEN es.share_amount
+            ELSE 0
+          END) AS owed_to
+    FROM expenses e
+    JOIN users u ON u.id = e.paid_by
+    LEFT JOIN expense_splits es ON es.expense_id = e.id
+    WHERE e.trip_id = ?
+    GROUP BY u.id, u.name
+    HAVING total_paid > 0;
+  `;
+
+  db.query(query, [tripId], (err, results) => {
+    if (err) throw new ApiError(500, err.message);
+
+    const data = results.map((row) => ({
+      user_id: row.user_id,
+      name: row.name,
+      total_paid: Number(parseFloat(row.total_paid).toFixed(2)),
+      owed_to: Number(parseFloat(row.owed_to).toFixed(2)),
+    }));
+
+    return res.status(200).json(
+      new ApiResponse(200, data, "Payees with total paid and owed amount")
+    );
+  });
+});
+

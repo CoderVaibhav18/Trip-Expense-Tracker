@@ -10,7 +10,7 @@ import UserProtectedWrapper from "./auth/UserProtectedWrapper";
 import Logout from "./pages/Logout";
 import Project from "./pages/Project";
 import AddExpense from "./pages/AddExpense";
-import TripExpenses from "./components/TripExpenses";
+import TripExpenses from "./pages/TripExpenses";
 import TripBalance from "./pages/TripBalance";
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
         <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
         <Route path="/trip/:tripId/expenses" element={<TripExpenses />} />
         <Route path="/balance/:tripId" element={<TripBalance />} />
-        <Route path="/repay/:tripId" element={<RepaymentForm />} />
+        <Route path="/repay/:tripId/:tripName" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />
         <Route path="*" element={<Error />} />
       </Routes>

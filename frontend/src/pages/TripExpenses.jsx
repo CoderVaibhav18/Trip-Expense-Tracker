@@ -15,8 +15,8 @@ import {
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const TripExpenses = () => {
   const { tripId } = useParams();
@@ -166,10 +166,10 @@ const TripExpenses = () => {
             Balance Summary
           </Link>
           <Link
-            to={`/balance/${tripId}/settle`}
+            to={`/repay/${tripId}/${tripDetails?.trip?.name}`}
             className="py-3 px-4 md:px-6 font-medium text-gray-500 hover:text-blue-500 transition-colors"
           >
-            Settle Up
+            Repayment
           </Link>
         </div>
 
@@ -341,9 +341,9 @@ const TripExpenses = () => {
             transition={{ staggerChildren: 0.1 }}
           >
             <AnimatePresence>
-              {filteredExpenses.map((expense) => (
+              {filteredExpenses.map((expense, idx) => (
                 <ExpenseCard
-                  key={expense.id}
+                  key={idx}
                   expense={expense}
                   formatDateTime={formatDateTime}
                 />
