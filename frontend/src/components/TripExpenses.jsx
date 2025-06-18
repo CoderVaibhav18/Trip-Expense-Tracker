@@ -77,7 +77,7 @@ const TripExpenses = () => {
     <>
       <Navbar />
       <motion.div
-        className="max-w-4xl mx-auto px-4 py-10"
+        className="max-w-4xl mx-auto px-4 py-10 animate-fade-in-up"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -95,6 +95,26 @@ const TripExpenses = () => {
             {tripDetails?.trip?.name || "Trip Expenses"}
           </h1>
           <div className="hidden md:block w-32"></div>
+        </div>
+        <div className="flex mb-6 border-b border-gray-200">
+          <Link
+            to={`/trip/${tripId}/expenses`}
+            className="py-3 px-6 font-medium text-blue-600 border-b-2 border-blue-600"
+          >
+            Expenses
+          </Link>
+          <Link
+            to={`/balance/${tripId}`}
+            className="py-3 px-6 font-medium text-gray-500  border-blue-600"
+          >
+            Balance Summary
+          </Link>
+          <Link
+            to={`/balance/${tripId}/settle`} // Your settlement page route
+            className="py-3 px-6 font-medium text-gray-500 hover:text-blue-500"
+          >
+            Settle Up
+          </Link>
         </div>
 
         {/* Summary Card */}
@@ -300,6 +320,23 @@ const TripExpenses = () => {
         )}
       </motion.div>
       <Footer />
+      <style>
+        {`
+          .animate-fade-in-up {
+            animation: fadeInUp 0.7s cubic-bezier(0.4,0,0.2,1);
+          }
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </>
   );
 };

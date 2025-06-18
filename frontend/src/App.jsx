@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
 import RepaymentForm from "./pages/RepaymentForm";
 import RepaymentHistory from "./pages/RepaymentHistory";
-import Navbar from "./components/Navbar";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -13,6 +11,7 @@ import Logout from "./pages/Logout";
 import Project from "./pages/Project";
 import AddExpense from "./pages/AddExpense";
 import TripExpenses from "./components/TripExpenses";
+import TripBalance from "./pages/TripBalance";
 
 function App() {
   return (
@@ -40,6 +39,7 @@ function App() {
         <Route path="/trip" element={<Project />} />
         <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
         <Route path="/trip/:tripId/expenses" element={<TripExpenses />} />
+        <Route path="/balance/:tripId" element={<TripBalance />} />
         <Route path="/repay/:tripId" element={<RepaymentForm />} />
         <Route path="/repayments/:tripId" element={<RepaymentHistory />} />
         <Route path="*" element={<Error />} />
