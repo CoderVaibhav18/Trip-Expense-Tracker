@@ -20,6 +20,7 @@ const TripExpenses = () => {
   const [tripDetails, setTripDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -50,7 +51,11 @@ const TripExpenses = () => {
       }
     };
 
+    const fetchUsers = async () => {};
+
+    fetchUsers();
     fetchExpenses();
+    fetchSettlementData();
   }, [tripId]);
 
   // Improved date formatting
@@ -72,6 +77,34 @@ const TripExpenses = () => {
     (sum, expense) => sum + parseFloat(expense.amount),
     0
   );
+  const [settlements, setSettlements] = useState([]);
+
+  // Add this function to fetch settlement data
+  const fetchSettlementData = async () => {
+    try {
+      const response = await API.get(`/expense/trip/${tripId}/summary`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+
+      // Transform the data
+      const transformedData = [];
+      for (const debtorId in response.data.data) {
+        for (const item of response.data.data[debtorId]) {
+          transformedData.push({
+            debtorId: parseInt(debtorId),
+            creditorId: item.owesTo,
+            amount: item.amount,
+          });
+        }
+      }
+
+      setSettlements(transformedData);
+    } catch (error) {
+      console.error("Error fetching settlement data:", error);
+    }
+  };
 
   return (
     <>
@@ -299,6 +332,55 @@ const TripExpenses = () => {
               </motion.div>
             ))}
           </motion.div>
+        )}
+
+        {settlements.length > 0 && (
+          <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 border border-blue-100">
+            <h3 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
+              <FiDollarSign className="mr-2" /> Who Owes Whom
+            </h3>
+
+            {settlements.map((item, index) => {
+              // Find user names (you'll need to have users data)
+              const debtor = users.find((u) => u.id === item.debtorId);
+              const creditor = users.find((u) => u.id === item.creditorId);
+
+              return (
+                <motion.div
+                  key={index}
+                  className="flex items-center justify-between p-4 mb-3 bg-blue-50 rounded-xl"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="flex items-center">
+                    <div className="bg-red-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                      <FiUser className="text-red-500" />
+                    </div>
+                    <span className="font-medium">
+                      {debtor?.name || "User " + item.debtorId}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center mx-4">
+                    <span className="text-gray-500 mx-2">owes</span>
+                    <div className="text-blue-700 font-bold px-3 py-1 bg-white rounded-full">
+                      ₹{item.amount.toFixed(2)}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center">
+                    <div className="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                      <FiUser className="text-green-500" />
+                    </div>
+                    <span className="font-medium">
+                      {creditor?.name || "User " + item.creditorId}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         )}
 
         {/* Add Expense Button */}
