@@ -8,6 +8,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE trips (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
@@ -16,6 +17,7 @@ CREATE TABLE trips (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id)
 );
+
 CREATE TABLE trip_members (
   id INT AUTO_INCREMENT PRIMARY KEY,
   trip_id INT NOT NULL,
@@ -24,6 +26,7 @@ CREATE TABLE trip_members (
   FOREIGN KEY (trip_id) REFERENCES trips(id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 CREATE TABLE expenses (
   id INT AUTO_INCREMENT PRIMARY KEY,
   trip_id INT NOT NULL,
@@ -35,6 +38,7 @@ CREATE TABLE expenses (
   FOREIGN KEY (trip_id) REFERENCES trips(id),
   FOREIGN KEY (paid_by) REFERENCES users(id)
 );
+
 CREATE TABLE expense_splits (
   id INT AUTO_INCREMENT PRIMARY KEY,
   expense_id INT NOT NULL,
@@ -44,6 +48,7 @@ CREATE TABLE expense_splits (
   FOREIGN KEY (expense_id) REFERENCES expenses(id),
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 CREATE TABLE repayments (
   id INT AUTO_INCREMENT PRIMARY KEY,
   trip_id INT,
