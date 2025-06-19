@@ -1,5 +1,6 @@
 USE expense_tracker;
 CREATE DATABASE expense_tracker;
+DROP DATABASE expense_tracker;
 
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
